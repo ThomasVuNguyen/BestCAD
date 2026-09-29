@@ -21,7 +21,7 @@ RUN cmake .. \
     -DUSE_TK=OFF \
     -DUSE_XLIB=OFF \
     -DCMAKE_INSTALL_PREFIX=/usr/local/occt
-RUN make -j$(nproc) install
+RUN make -j$(( $(nproc) > 4 ? 4 : $(nproc) )) install
 
 # Stage 2: web-builder
 FROM node:22-bookworm-slim AS web-builder
