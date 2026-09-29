@@ -21,7 +21,7 @@ RUN cmake .. \
     -DUSE_TK=OFF \
     -DUSE_XLIB=OFF \
     -DCMAKE_INSTALL_PREFIX=/usr/local/occt
-RUN make -j$(( $(nproc) > 4 ? 4 : $(nproc) )) install
+RUN make -j2 install
 
 # Stage 2: web-builder
 FROM node:22-bookworm-slim AS web-builder
@@ -42,7 +42,7 @@ COPY Cargo.toml Cargo.lock* ./
 COPY crates ./crates
 RUN --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/app/target \
-    cargo build --release && \
+    CARGO_BUILD_JOBS=2 cargo build --release && \
     cp target/release/bestcad-api /app/bestcad-api
 
 # Stage 4: runtime
