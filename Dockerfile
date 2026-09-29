@@ -1,11 +1,9 @@
 # Stage 1: occt-builder
 FROM debian:bookworm AS occt-builder
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y \
-    cmake g++ make git \
-    libtcl8.6-dev libtk8.6-dev \
-    libfreetype-dev libxi-dev \
-    libxmu-dev libgl-dev \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    cmake g++ make git ca-certificates \
+    libfreetype-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /build
@@ -19,6 +17,9 @@ RUN cmake .. \
     -DUSE_TBB=OFF \
     -DUSE_FREEIMAGE=OFF \
     -DUSE_VTK=OFF \
+    -DUSE_TCL=OFF \
+    -DUSE_TK=OFF \
+    -DUSE_XLIB=OFF \
     -DCMAKE_INSTALL_PREFIX=/usr/local/occt
 RUN make -j$(nproc) install
 
@@ -35,7 +36,7 @@ RUN pnpm build
 FROM rust:1-bookworm AS rust-builder
 COPY --from=occt-builder /usr/local/occt /usr/local/occt
 ENV OCCT_ROOT=/usr/local/occt
-ENV LD_LIBRARY_PATH=/usr/local/occt/lib:$LD_LIBRARY_PATH
+ENV LD_LIBRARY_PATH=/usr/local/occt/lib
 WORKDIR /app
 COPY Cargo.toml Cargo.lock* ./
 COPY crates ./crates
@@ -50,11 +51,11 @@ COPY --from=occt-builder /usr/local/occt/lib /usr/local/occt/lib
 COPY --from=rust-builder /app/bestcad-api /app/bestcad-api
 COPY --from=web-builder /app/web/dist /app/web/dist
 
-ENV LD_LIBRARY_PATH=/usr/local/occt/lib:$LD_LIBRARY_PATH
+ENV LD_LIBRARY_PATH=/usr/local/occt/lib
 ENV BESTCAD_STATIC_DIR=/app/web/dist
 EXPOSE 3001
 
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 HEALTHCHECK --interval=30s --timeout=3s \
   CMD curl -f http://localhost:3001/api/health || exit 1
 

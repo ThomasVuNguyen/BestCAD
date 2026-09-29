@@ -27,7 +27,7 @@ jobs:
       - name: Install OCCT system deps
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake g++ make libtcl8.6-dev libtk8.6-dev libfreetype-dev libxi-dev libxmu-dev libgl-dev
+          sudo apt-get install -y --no-install-recommends cmake g++ make libfreetype-dev
       - name: Cache OCCT Build
         id: cache-occt
         uses: actions/cache@v4
@@ -40,7 +40,7 @@ jobs:
           git clone --depth 1 --branch V8_0_1 https://github.com/Open-Cascade-SAS/OCCT.git /tmp/OCCT
           cd /tmp/OCCT
           mkdir build && cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_MODULE_Draw=OFF -DBUILD_MODULE_Visualization=OFF -DBUILD_DOC_Overview=OFF -DUSE_TBB=OFF -DUSE_FREEIMAGE=OFF -DUSE_VTK=OFF -DCMAKE_INSTALL_PREFIX=/usr/local/occt
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_MODULE_Draw=OFF -DBUILD_MODULE_Visualization=OFF -DBUILD_DOC_Overview=OFF -DUSE_TBB=OFF -DUSE_FREEIMAGE=OFF -DUSE_VTK=OFF -DUSE_TCL=OFF -DUSE_TK=OFF -DUSE_XLIB=OFF -DCMAKE_INSTALL_PREFIX=/usr/local/occt
           make -j$(nproc)
           sudo make install
       - name: Rust fmt
