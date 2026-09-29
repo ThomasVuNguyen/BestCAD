@@ -1,0 +1,15 @@
+[package]
+name = "bestcad-api"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+bestcad-types = { path = "../bestcad-types" }
+bestcad-geometry = { path = "../bestcad-geometry" }
+axum = { workspace = true }
+tokio = { workspace = true }
+tower-http = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }

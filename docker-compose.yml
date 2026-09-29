@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  bestcad:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - BESTCAD_STATIC_DIR=/app/web/dist
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    # Note: No database in M0 - all state is in-memory
